@@ -29,40 +29,12 @@ class util
 
         // Otherwise, we fail.
         else {
-            throw new Exception("Enter valid MAC ID - ".$tmpmac." is not valid", 422);
+            throw new Exception("Enter valid MAC ID - " . $tmpmac . " is not valid", 422);
         }
     }
-
 
     public static function base64url_encode($data)
     {
         return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
-    }
-
-    public static function getToken($pid)
-    {
-        $now = time();
-        $future = strtotime('+30 min', $now);
-        $secretKey = "secret_key";
-        $payload = [
-            "jti" => $pid,
-            "iat" => $now,
-            "exp" => $future
-        ];
-        $headers =  ['alg' => 'HS256', 'typ' => 'JWT'];
-        $headers_encoded = self::base64url_encode(json_encode($headers));
-        $payload_encoded = self::base64url_encode(json_encode($payload));
-
-        $signature = hash_hmac('sha256', "$headers_encoded.$payload_encoded", $secretKey, true);
-        $signature_encoded = self::base64url_encode($signature);
-        $token = "$headers_encoded.$payload_encoded.$signature_encoded";
-
-        $jwt = array();
-        $jwt["JWT token"] = $token;
-        $jwt['now'] = $now;
-        $jwt['future'] = $future;
-        //$jwt["Expires in"] = (($future-$now)/60)." minutes";
-
-        return json_encode($jwt);
     }
 }
