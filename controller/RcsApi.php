@@ -13,10 +13,10 @@ class RcsApi
     public static function getPhoneByPhoneID(Request $request, Response $response, $args)
     {
         try {
-            $id = isset($args['phoneID'])?$args['phoneID']:'';
+            $id = isset($args['phoneID']) ? $args['phoneID'] : '';
             $validateMac = util::cleanMacAddress($id);
             $rcsGetPhoneByID = RcsModel::getPhoneByPhoneID($validateMac);
-            $response->getBody()->write($rcsGetPhoneByID);
+            $response->getBody()->write(json_encode($rcsGetPhoneByID));
             return $response;
         } catch (Exception $httpException) {
             $throwMessage = $httpException->getMessage();
@@ -32,7 +32,7 @@ class RcsApi
     {
         try {
             $allPhones = RcsModel::getAllPhones();
-            $response->getBody()->write($allPhones);
+            $response->getBody()->write(json_encode($allPhones));
             return $response;
         } catch (Exception $httpException) {
             // Handle the http exception here
@@ -50,7 +50,7 @@ class RcsApi
         try {
             $serverId = $args['serverId'];
             $rcsGetPhoneByServerID = RcsModel::getPhonesByServerID($serverId);
-            $response->getBody()->write($rcsGetPhoneByServerID);
+            $response->getBody()->write(json_encode($rcsGetPhoneByServerID));
             return $response;
         } catch (Exception $httpException) {
             $throwMessage = $httpException->getMessage();
@@ -67,7 +67,7 @@ class RcsApi
         try {
             $vid = $args['vendorId'];
             $getAccountSummary = RcsModel::getAccountSummary($vid);
-            $response->getBody()->write($getAccountSummary);
+            $response->getBody()->write(json_encode($getAccountSummary));
             return $response;
         } catch (Exception $httpException) {
             $throwMessage   = $httpException->getMessage();
@@ -80,16 +80,16 @@ class RcsApi
     }
 
     //delete phones by phone id
-    public static function deleteByPhoneId(Request $request, Response $response, $args)
+    public static function deletePhone(Request $request, Response $response, $args)
     {
         try {
             //$id = $args['phoneID'];
             $requestData = $request->getBody();
             $data = json_decode($requestData, true);
-            
+
             //$validateMac = util::cleanMacAddress($id);
-            $deletePhone = RcsModel::deleteByPhoneId($data);
-            $response->getBody()->write($deletePhone);
+            $deletePhone = RcsModel::deletePhone($data);
+            $response->getBody()->write(json_encode($deletePhone));
             return $response;
         } catch (Exception $httpException) {
             $throwMessage  = $httpException->getMessage();
@@ -107,7 +107,7 @@ class RcsApi
             $requestData = $request->getBody();
             $data = json_decode($requestData, true);
             $addPhone = RcsModel::addPhone($data);
-            $response->getBody()->write($addPhone);
+            $response->getBody()->write(json_encode($addPhone));
             return $response;
         } catch (Exception $httpException) {
             $throwMessage  = $httpException->getMessage();
@@ -119,15 +119,15 @@ class RcsApi
         }
     }
     //update phone details
-    public static function updatePhonesByPhoneId(Request $request, Response $response, $args)
+    public static function updatePhone(Request $request, Response $response, $args)
     {
         try {
-            $pid = $args['phoneID'];
-            $validateMac = util::cleanMacAddress($pid);
+            //$pid = $args['phoneID'];
+            //$validateMac = util::cleanMacAddress($pid);
             $requestData = $request->getBody();
             $data = json_decode($requestData, true);
-            $updatePhone = RcsModel::updatePhonesByPhoneId($validateMac, $data);
-            $response->getBody()->write($updatePhone);
+            $updatePhone = RcsModel::updatePhone($data);
+            $response->getBody()->write(json_encode($updatePhone));
             return $response;
         } catch (Exception $httpException) {
             $throwMessage  = $httpException->getMessage();
@@ -143,15 +143,33 @@ class RcsApi
     public static function getToken(Request $request, Response $response, $args)
     {
         try {
-            if(isset($args['phoneID'])){
+            if (isset($args['phoneID'])) {
                 $pid = $args['phoneID'];
                 $validateMac = util::cleanMacAddress($pid);
-            }
-            else{
-                $validateMac='';
+            } else {
+                $validateMac = '';
             }
             $getToken = RcsModel::getToken($validateMac);
-            $response->getBody()->write($getToken);
+            //return $getToken;
+            $response->getBody()->write(json_encode($getToken));
+            return $response;
+        } catch (Exception $httpException) {
+            $throwMessage = $httpException->getMessage();
+            $statusCode   = $httpException->getCode();
+            $errorMessage["error"]        = $throwMessage;
+            $errorMessage["status code"]  = $statusCode;
+            $response->getBody()->write(json_encode($errorMessage));
+            return $response->withStatus($statusCode);
+        }
+    }
+
+    public static function login(Request $request, Response $response, $args)
+    {
+        try {
+            $requestData = $request->getBody();
+            $data = json_decode($requestData, true);
+            $login = RcsModel::login($data);
+            $response->getBody()->write(json_encode($login));
             return $response;
         } catch (Exception $httpException) {
             $throwMessage = $httpException->getMessage();
