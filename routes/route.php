@@ -2,7 +2,6 @@
 require __DIR__ . './../controller/RcsApi.php';
 class RcsRouter
 {
-
     public static  function route($app)
     {
         $app->group('/api', function ($app) {
@@ -13,11 +12,10 @@ class RcsRouter
 
             $app->post('/addPhone', 'RcsApi::addPhone');
 
-            $app->delete('/deletePhone[/{phoneID}]', 'RcsApi::deleteByPhoneId');
+            $app->delete('/deletePhone[/{phoneID}]', 'RcsApi::deletePhone');
 
-            $app->put('/updatePhone/{phoneID}','RcsApi::updatePhonesByPhoneId'); 
+            $app->put('/updatePhone', 'RcsApi::updatePhone');
         })->add(new JwtMiddleware);
-        
-            $app->get('/token[/{phoneID}]', 'RcsApi::getToken');
+        $app->post('/login', 'RcsApi::login');
     }
 }
